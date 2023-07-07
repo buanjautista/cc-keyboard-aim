@@ -1,0 +1,23 @@
+{
+	"labels": {
+		"options": {
+			"headers": {
+				"cc-aim-master": "Aim Master"
+			},
+
+			"controls": {
+				"keys": {
+					"aim": "Shoot",
+					"aim-up": "Aim Up",
+					"aim-up-left": "Aim Up-Left",
+					"aim-up-right": "Aim Up-Right",
+					"aim-down": "Aim Down",
+					"aim-down-left": "Aim Down-Left",
+					"aim-down-right": "Aim Down-Right",
+					"aim-left": "Aim Left",
+					"aim-right": "Aim Right"
+				}
+			}
+		}
+	}
+}

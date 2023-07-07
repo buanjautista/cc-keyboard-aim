@@ -1,0 +1,12 @@
+{
+	"name": "Aim Master",
+	"version": "0.6.6",
+	"description": "An attempt to bring the right-stick controller aiming into keyboard.",
+	
+	"prestart": "prestart.js",
+	"dependencies": {
+		"input-api": "^1.0.0"
+	},
+
+    "ccmodDependencies": {}
+}
