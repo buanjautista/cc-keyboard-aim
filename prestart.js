@@ -113,22 +113,35 @@ sc.Control.inject({
 			: ig.input.state("aim") || ig.gamepad.isRightStickDown() || sc.control.checkKeyAim(); 
 	},
 	checkKeyAim: function () {
-		return (ig.input.state('aim-up') ||  ig.input.state('aim-left') || ig.input.state('aim-right') || ig.input.state('aim-down')) 
+		return (
+			ig.input.state('aim-up') || ig.input.state('aim-left') || ig.input.state('aim-right') || ig.input.state('aim-down') || 
+			ig.input.state('aim-down-left') || ig.input.state('aim-down-right') || ig.input.state('aim-up-left') || ig.input.state('aim-up-right')) 
 	},
 	getKeyAim: function () {
 		ig.input.state('aim-up') ? aimup = 1 : aimup = 0;
 		ig.input.state('aim-up-right') ? aimupr = 1 : aimupr = 0;
 		ig.input.state('aim-up-left') ? aimupl = 1 : aimupl = 0;
+		ig.input.state('aim-down') ? aimdown = 1 : aimdown = 0;
+		ig.input.state('aim-down-left') ? aimdownl = 1 : aimdownl = 0;
+		ig.input.state('aim-down-right') ? aimdownr = 1 : aimdownr = 0;
 		ig.input.state('aim-left') ? aimleft = 1 : aimleft = 0;
 		ig.input.state('aim-right') ? aimright  = 1 : aimright  = 0;
-		ig.input.state('aim-down-left') ? aimdownl = 1 : aimdownl = 0;
-		ig.input.state('aim-down') ? aimdown = 1 : aimdown = 0;
-		ig.input.state('aim-down-right') ? aimdownr = 1 : aimdownr = 0;
 		
-		var y_axis = 0 + ((aimup + (aimupr))-aimdown);
-		var x_axis = 0 + (aimleft-aimright);
-		var newAxis = {"x": x_axis, "y": y_axis, "z": 0}
+		const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
+		var y_axis = 0 + (
+			clamp(((aimup + aimupr + aimupl)/3), -1, 1) 
+		-
+		clamp(((aimdown + aimdownl + aimdownr)/3), -1, 1));
+			
+		var x_axis = 0 + (
+			clamp(((aimleft + aimupl + aimdownl)/3), -1, 1)
+			-
+			clamp(((aimright + aimdownr + aimupr)/3), -1, 1));
+
+		var newAxis = {"x": x_axis, "y": y_axis, "z": 0}
+		
+		// console.log(x_axis, y_axis)
 		return newAxis
 	}
 })
