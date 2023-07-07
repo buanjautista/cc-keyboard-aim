@@ -8,7 +8,7 @@ sc.OPTIONS_DEFINITION['keys-aim'] = {
 	},
 	cat: sc.OPTION_CATEGORY.CONTROLS,
 	hasDivider: true,
-	header: "cc-aim-master",
+	header: "cc-keyboard-aim",
 };
 
 sc.OPTIONS_DEFINITION['keys-aim-up'] = {
@@ -19,7 +19,7 @@ sc.OPTIONS_DEFINITION['keys-aim-up'] = {
 	},
 	cat: sc.OPTION_CATEGORY.CONTROLS,
 	hasDivider: false,
-	header: "cc-aim-master",
+	header: "cc-keyboard-aim",
 };
 
 sc.OPTIONS_DEFINITION['keys-aim-down'] = {
@@ -30,7 +30,7 @@ sc.OPTIONS_DEFINITION['keys-aim-down'] = {
 	},
 	cat: sc.OPTION_CATEGORY.CONTROLS,
 	hasDivider: false,
-	header: "cc-aim-master",
+	header: "cc-keyboard-aim",
 };
 
 sc.OPTIONS_DEFINITION['keys-aim-left'] = {
@@ -41,7 +41,7 @@ sc.OPTIONS_DEFINITION['keys-aim-left'] = {
 	},
 	cat: sc.OPTION_CATEGORY.CONTROLS,
 	hasDivider: false,
-	header: "cc-aim-master",
+	header: "cc-keyboard-aim",
 };
 
 sc.OPTIONS_DEFINITION['keys-aim-right'] = {
@@ -52,7 +52,7 @@ sc.OPTIONS_DEFINITION['keys-aim-right'] = {
 	},
 	cat: sc.OPTION_CATEGORY.CONTROLS,
 	hasDivider: false,
-	header: "cc-aim-master",
+	header: "cc-keyboard-aim",
 };
 
 sc.OPTIONS_DEFINITION['keys-aim-up-left'] = {
@@ -63,7 +63,7 @@ sc.OPTIONS_DEFINITION['keys-aim-up-left'] = {
 	},
 	cat: sc.OPTION_CATEGORY.CONTROLS,
 	hasDivider: false,
-	header: "cc-aim-master",
+	header: "cc-keyboard-aim",
 };
 
 sc.OPTIONS_DEFINITION['keys-aim-up-right'] = {
@@ -74,7 +74,7 @@ sc.OPTIONS_DEFINITION['keys-aim-up-right'] = {
 	},
 	cat: sc.OPTION_CATEGORY.CONTROLS,
 	hasDivider: false,
-	header: "cc-aim-master",
+	header: "cc-keyboard-aim",
 };
 
 sc.OPTIONS_DEFINITION['keys-aim-down-left'] = {
@@ -85,7 +85,7 @@ sc.OPTIONS_DEFINITION['keys-aim-down-left'] = {
 	},
 	cat: sc.OPTION_CATEGORY.CONTROLS,
 	hasDivider: false,
-	header: "cc-aim-master",
+	header: "cc-keyboard-aim",
 };
 
 sc.OPTIONS_DEFINITION['keys-aim-down-right'] = {
@@ -96,10 +96,10 @@ sc.OPTIONS_DEFINITION['keys-aim-down-right'] = {
 	},
 	cat: sc.OPTION_CATEGORY.CONTROLS,
 	hasDivider: false,
-	header: "cc-aim-master",
+	header: "cc-keyboard-aim",
 };
 
-// Aim check replacements + KeyAim funcs
+// Aim check replacements + KeyAiming funcs
 
 sc.Control.inject({
 	aimStart: function () {
@@ -112,36 +112,35 @@ sc.Control.inject({
 			? this.autoControl.get("aiming")
 			: ig.input.state("aim") || ig.gamepad.isRightStickDown() || sc.control.checkKeyAim(); 
 	},
+	
 	checkKeyAim: function () {
 		return (
 			ig.input.state('aim-up') || ig.input.state('aim-left') || ig.input.state('aim-right') || ig.input.state('aim-down') || 
 			ig.input.state('aim-down-left') || ig.input.state('aim-down-right') || ig.input.state('aim-up-left') || ig.input.state('aim-up-right')) 
 	},
 	getKeyAim: function () {
-		ig.input.state('aim-up') ? aimup = 1 : aimup = 0;
-		ig.input.state('aim-up-right') ? aimupr = 1 : aimupr = 0;
-		ig.input.state('aim-up-left') ? aimupl = 1 : aimupl = 0;
-		ig.input.state('aim-down') ? aimdown = 1 : aimdown = 0;
-		ig.input.state('aim-down-left') ? aimdownl = 1 : aimdownl = 0;
-		ig.input.state('aim-down-right') ? aimdownr = 1 : aimdownr = 0;
-		ig.input.state('aim-left') ? aimleft = 1 : aimleft = 0;
-		ig.input.state('aim-right') ? aimright  = 1 : aimright  = 0;
-		
-		const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+		aimup = ig.input.state('aim-up') || 0
+		aimupr = ig.input.state('aim-up-right') || 0
+		aimupl = ig.input.state('aim-up-left')  || 0
 
-		var y_axis = 0 + (
-			clamp(((aimup + aimupr + aimupl)/3), -1, 1) 
-		-
-		clamp(((aimdown + aimdownl + aimdownr)/3), -1, 1));
-			
-		var x_axis = 0 + (
-			clamp(((aimleft + aimupl + aimdownl)/3), -1, 1)
-			-
-			clamp(((aimright + aimdownr + aimupr)/3), -1, 1));
+		aimdown = ig.input.state('aim-down') || 0
+		aimdownl = ig.input.state('aim-down-left') || 0
+		aimdownr = ig.input.state('aim-down-right') || 0
+
+		aimleft = ig.input.state('aim-left') || 0
+		aimright = ig.input.state('aim-right') || 0
+
+		// Grabs each 'axis' and sum the adjacent sides to get the small diagonals
+		up_sum = Number((aimup + aimupr + aimupl)/3)
+		down_sum = Number((aimdown + aimdownl + aimdownr)/3)
+		left_sum = Number((aimleft + aimdownl + aimupl)/3)
+		right_sum = Number((aimright + aimdownr + aimupr)/3)
+
+		// Gets the x-y axis from the input sum above
+		var y_axis = 0 + ((up_sum - down_sum).limit(-1, 1));
+		var x_axis = 0 + ((left_sum - right_sum).limit(-1, 1));
 
 		var newAxis = {"x": x_axis, "y": y_axis, "z": 0}
-		
-		// console.log(x_axis, y_axis)
 		return newAxis
 	}
 })
@@ -149,30 +148,26 @@ sc.Control.inject({
 sc.PlayerCrossHairController.inject({
 	updatePos: function (a) {
 		if (this.gamepadMode) {
-			if (sc.control.isRightStickDown()) {
-				var c = Vec2.flip(Vec2.sub(a._getThrowerPos(e), a.coll.pos)),
-					d = Vec2.assignC(
-						b,
-						sc.control.getAxesValue(ig.AXES.RIGHT_STICK_X) *
-							ig.system.height *
-							0.6,
-						sc.control.getAxesValue(ig.AXES.RIGHT_STICK_Y) *
-							ig.system.height *
-							0.6
-					);
-				Vec2.lerp(c, d, ig.system.actualTick * 18);
-				a._getThrowerPos(a.coll.pos);
-				a.coll.pos.x = a.coll.pos.x + c.x;
-				a.coll.pos.y = a.coll.pos.y + c.y;
-			}
-		} 
+      		this.parent(...args);
+      		return;
+    	}
 
-		else if (sc.control.checkKeyAim()){ 
-			// An attempt to grab the key axis and slap it on the controller method above
+		// An attempt to grab the key axis and slap it on the controller method above
+		// i have no idea what this does
+
+		else if (sc.control.checkKeyAim()){ 	
+			// Grabs the keyboard aim vector and scales it with screen
+			b = Vec2.create()
+			Vec2.assignC(b, sc.control.getKeyAim().x * ig.system.height * 0.6, sc.control.getKeyAim().y * ig.system.height * 0.6)
+
+			// Gets player position and compares with keyboard aim pos?
 			var c = Vec2.flip(Vec2.sub(a._getThrowerPos(this), a.coll.pos)),
-					d = Vec2.flip(sc.control.getKeyAim());
-					Vec2.lerp(c, d, ig.system.actualTick * 18);
 
+					d = Vec2.flip(b);
+					
+					Vec2.lerp(c, d, ig.system.actualTick * 18); 
+
+			// Moves crosshair to new position
 			a._getThrowerPos(a.coll.pos);
 			a.coll.pos.x = a.coll.pos.x + c.x;
 			a.coll.pos.y = a.coll.pos.y + c.y;

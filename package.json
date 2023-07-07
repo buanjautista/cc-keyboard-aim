@@ -1,6 +1,6 @@
 {
-	"name": "Aim Master",
-	"version": "0.6.6",
+	"name": "Keyboard Aiming",
+	"version": "0.0.1",
 	"description": "An attempt to bring the right-stick controller aiming into keyboard.",
 	
 	"prestart": "prestart.js",
